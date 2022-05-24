@@ -197,13 +197,14 @@ def showAbout():
     #tkm.showinfo('ダイアログのタイトル', '普通のダイアログ')
     dialog = tk.Toplevel()
     dialog.title("About Kanzo")
-    dialog.geometry("200x200")
+    dialog.geometry("300x150")
     alabel = tk.Label(dialog,text="Kanzo",font=("",20,"bold"))
     alabel.pack()
-    alabel = tk.Label(dialog,text="Memopad with a StenoGrapher",font=("",12,"bold"))
+    alabel = tk.Label(dialog,text="(c) @memukuge",font=("",12,""))
     alabel.pack()
-    alabel = tk.Label(dialog,text="Copylight(c) 2022- @memukuge",font=("",12,"bold"))
+    alabel = tk.Label(dialog,text="https://github.com/memukuge/kanzo",font=("",9,"bold"))
     alabel.pack()
+
 
     pass
 def saveAs():
