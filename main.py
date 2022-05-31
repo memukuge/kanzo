@@ -9,6 +9,7 @@ import threading
 import os
 import queue
 import sounddevice as sd
+import sounddevice
 import vosk
 import sys
 
@@ -23,9 +24,12 @@ root.title("Kanzo - memopad with a stenographer")
 root.config(menu=menubar)
 root.geometry("640x480")
 
+iconfile = './favicon.ico'
+root.iconbitmap(default=iconfile)
+
 fontStyle = tkFont.Font("", size=15)
 
-label = tk.Label(root,text="hoge",font=fontStyle)
+label = tk.Label(root,text="",font=fontStyle)
 label.pack(side = tk.BOTTOM,anchor = tk.SW,expand=tk.NO)
 
 textbox = ScrolledText(root, font=fontStyle)
