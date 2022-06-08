@@ -9,12 +9,13 @@ import threading
 import os
 import queue
 import sounddevice as sd
-import sounddevice
 import vosk
 import sys
 
 import json
 import unicodedata
+
+import ctypes
 
 
 root = tk.Tk()
@@ -106,11 +107,13 @@ def runVosk():
     #try:
     # args=(model.get(),device.get())
     global stopFlag
+    ctypes.windll.ole32.CoInitialize(None)
     while True:
         stopFlag=False
         voskmodel = vosk.Model(model.get())
         device_info = sd.query_devices(device.get())
         samplerate = int(device_info['default_samplerate'])
+        print("samplerate " + str(samplerate))
         with sd.RawInputStream(samplerate=samplerate, blocksize = 8000, device=device.get(), dtype='int16',channels=1, callback=callback):
             print('#' * 80)
             print('Press Ctrl+C to stop the recording')
@@ -168,6 +171,7 @@ index = 0
 print(hostapis[0])
 for d in devices:
     api=""
+    #print(d, sd._lib.PaWasapi_IsLoopback(index))
     if d["max_input_channels"] > 0:
         for h in hostapis:
             if index in h["devices"]:
