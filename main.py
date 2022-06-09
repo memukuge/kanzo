@@ -16,7 +16,7 @@ import json
 import unicodedata
 
 import ctypes
-
+import numpy as np
 
 root = tk.Tk()
 menubar = tk.Menu(root)
@@ -67,7 +67,7 @@ def callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     if status:
         print(status, file=sys.stderr)
-    q.put(bytes(indata))
+    q.put(indata)
 
 def get_east_asian_width_count(text):
     count = 0
@@ -109,47 +109,59 @@ def runVosk():
     global stopFlag
     ctypes.windll.ole32.CoInitialize(None)
     while True:
-        stopFlag=False
-        voskmodel = vosk.Model(model.get())
-        device_info = sd.query_devices(device.get())
-        samplerate = int(device_info['default_samplerate'])
-        print("samplerate " + str(samplerate))
-        with sd.RawInputStream(samplerate=samplerate, blocksize = 8000, device=device.get(), dtype='int16',channels=1, callback=callback):
-            print('#' * 80)
-            print('Press Ctrl+C to stop the recording')
-            print('#' * 80)
+        try:
+            label['text']="Being ready to recognize..."
+            stopFlag=False
+            voskmodel = vosk.Model(model.get())
+            device_info = sd.query_devices(device.get())
+            samplerate = int(device_info['default_samplerate'])
+            channels = int(device_info["max_input_channels"])
+            #print("samplerate " + str(samplerate))
+            with sd.InputStream(samplerate=samplerate, blocksize = 8000, device=device.get(), dtype='int16',channels=channels, callback=callback):
+                print('#' * 80)
+                print('Press Ctrl+C to stop the recording')
+                print('#' * 80)
 
-            rec = vosk.KaldiRecognizer(voskmodel, samplerate)
-            while True:
-                if stopFlag:
-                    print("stopflag")
-                    break
-                data = q.get()
-                if rec.AcceptWaveform(data):
-                    result = rec.Result()
-                    #print(type(result))
-                    resjson = json.loads(result)
-                    #print(resjson["text"])
-                    resultText = resjson["text"]
-                    if len(resultText) > 0:
-                        if is_japanese(resultText):
-                            resultText = resultText.replace(' ', '')
-                        addtext(resultText + "\r\n" )
-                else:
-                    #print(rec.PartialResult())
-                    result = rec.PartialResult()
-                    resjson = json.loads(result)
-                    #print(resjson["partial"])
-                    resText = "Recognizing: " + resjson["partial"]
-                    strcap = (root.winfo_width() - 100) / fontsize.get() * 2
-                    strlen = get_east_asian_width_count(resText)
-                    #print(str(strcap) + ", " + str(strlen))
-                    if strcap < strlen:
-                        cutlen = strlen - strcap
-                        cuthlen = count_double_byte_str(resText,cutlen)
-                        resText = resText[cuthlen:]
-                    label['text']=resText
-    
+                rec = vosk.KaldiRecognizer(voskmodel, samplerate)
+                while True:
+                    if stopFlag:
+                        print("stopflag")
+                        break
+                    rdata = q.get()
+                    #print(rdata)
+                    data = np.array(rdata[:,0], dtype='int16')
+                    #print(data)
+                    bdata = data.tobytes()
+                    if rec.AcceptWaveform(bdata):
+                        result = rec.Result()
+                        #print(type(result))
+                        resjson = json.loads(result)
+                        #print(resjson["text"])
+                        resultText = resjson["text"]
+                        if len(resultText) > 0:
+                            if is_japanese(resultText):
+                                resultText = resultText.replace(' ', '')
+                            addtext(resultText + "\r\n" )
+                    else:
+                        #print(rec.PartialResult())
+                        result = rec.PartialResult()
+                        resjson = json.loads(result)
+                        #print(resjson["partial"])
+                        resText = "Recognizing: " + resjson["partial"]
+                        strcap = (root.winfo_width() - 100) / fontsize.get() * 2
+                        strlen = get_east_asian_width_count(resText)
+                        #print(str(strcap) + ", " + str(strlen))
+                        if strcap < strlen:
+                            cutlen = strlen - strcap
+                            cuthlen = count_double_byte_str(resText,cutlen)
+                            resText = resText[cuthlen:]
+                        label['text']=resText
+        except Exception as e:
+            print("exception")
+            print(e)
+            label['text']="ERROR:cannot open device, try other device"
+            time.sleep(2)
+            pass
 """
     except KeyboardInterrupt:
         print('\nDone')
