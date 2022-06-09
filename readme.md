@@ -21,4 +21,7 @@ windowsサウンドミキサーや、音声ループバックデバイス作成�
 
 ## ソースコードからの起動
 ソースコードをクローンして、お好きなpython環境で実行してください。以下のパッケージをあらかじめインストールする必要があります。
-sounddevice、vosk、ktinker
+sounddevice(0.4.4)、vosk、ktinker、numpy
+なお、tag 0.2betaに当たるコードからは、portaudioのwasapi loopbackパッチ版を使っています。
+https://github.com/memukuge/portaudiobinary_wasapi
+
