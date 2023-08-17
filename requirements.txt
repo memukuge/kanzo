@@ -1,0 +1,14 @@
+certifi==2023.7.22
+cffi==1.15.1
+charset-normalizer==3.2.0
+colorama==0.4.6
+idna==3.4
+numpy==1.25.2
+pycparser==2.21
+requests==2.31.0
+sounddevice @ git+https://github.com/memukuge/python-sounddevice-loopback.git@4e3df31691504df7ef03a250b9164e554f7776c3
+srt==3.5.3
+tqdm==4.66.1
+urllib3==2.0.4
+vosk==0.3.45
+websockets==11.0.3

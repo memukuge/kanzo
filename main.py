@@ -28,7 +28,8 @@ root.geometry("640x480")
 iconfile = './favicon.ico'
 root.iconbitmap(default=iconfile)
 
-fontStyle = tkFont.Font("", size=15)
+fontStyle = tkFont.Font(root, size=15)
+#fontStyle = tk.font.Font("", size=15)
 
 label = tk.Label(root,text="",font=fontStyle)
 label.pack(side = tk.BOTTOM,anchor = tk.SW,expand=tk.NO)
